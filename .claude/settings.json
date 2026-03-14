@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(conda info:*)",
+      "Bash(conda install:*)",
+      "Bash(/opt/homebrew/bin/python3.12 -c \"import numpy; print\\(numpy.__version__\\)\")"
+    ]
+  }
+}
