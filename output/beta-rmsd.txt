@@ -1,0 +1,127 @@
+====== RMSD RESULTS FOR BETA SHEETS ======
+PyMOL>align dam4, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 85.000
+ ExecutiveAlign: 266 atoms aligned.
+ Executive: RMSD =    0.192 (266 to 266 atoms)
+PyMOL>align des8, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 94.000
+ ExecutiveAlign: 265 atoms aligned.
+ Executive: RMSD =    0.154 (265 to 265 atoms)
+PyMOL>align des9, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 98.000
+ ExecutiveAlign: 268 atoms aligned.
+ Executive: RMSD =    0.153 (268 to 268 atoms)
+PyMOL>align des10, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 86.000
+ ExecutiveAlign: 263 atoms aligned.
+ Executive: RMSD =    2.711 (263 to 263 atoms)
+PyMOL>align des11, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 22 x 21 pairwise scores.
+ MatchAlign: aligning residues (22 vs 21)...
+ MatchAlign: score 91.000
+ ExecutiveAlign: 266 atoms aligned.
+ Executive: RMSD =    3.254 (266 to 266 atoms)
+PyMOL>align des12, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 90.000
+ ExecutiveAlign: 266 atoms aligned.
+ Executive: RMSD =    2.707 (266 to 266 atoms)
+PyMOL>align n_res0, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 20 x 21 pairwise scores.
+ MatchAlign: aligning residues (20 vs 21)...
+ MatchAlign: score 76.000
+ ExecutiveAlign: 260 atoms aligned.
+ Executive: RMSD =    3.140 (260 to 260 atoms)
+PyMOL>align n_res1, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 20 x 21 pairwise scores.
+ MatchAlign: aligning residues (20 vs 21)...
+ MatchAlign: score 69.000
+ ExecutiveAlign: 251 atoms aligned.
+ Executive: RMSD =    2.932 (251 to 251 atoms)
+PyMOL>align n_res2, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 20 x 21 pairwise scores.
+ MatchAlign: aligning residues (20 vs 21)...
+ MatchAlign: score 70.000
+ ExecutiveAlign: 251 atoms aligned.
+ Executive: RMSD =    2.927 (251 to 251 atoms)
+PyMOL>align n_res3, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 20 x 21 pairwise scores.
+ MatchAlign: aligning residues (20 vs 21)...
+ MatchAlign: score 69.000
+ ExecutiveAlign: 251 atoms aligned.
+ Executive: RMSD =    2.932 (251 to 251 atoms)
+PyMOL>align n_res4, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 20 x 21 pairwise scores.
+ MatchAlign: aligning residues (20 vs 21)...
+ MatchAlign: score 76.000
+ ExecutiveAlign: 252 atoms aligned.
+ Executive: RMSD =    2.922 (252 to 252 atoms)
+PyMOL>align res0, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 85.000
+ ExecutiveAlign: 258 atoms aligned.
+ Executive: RMSD =    0.116 (258 to 258 atoms)
+PyMOL>align res1, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 84.000
+ ExecutiveAlign: 258 atoms aligned.
+ Executive: RMSD =    0.156 (258 to 258 atoms)
+PyMOL>align res2, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 87.000
+ ExecutiveAlign: 258 atoms aligned.
+ Executive: RMSD =    0.116 (258 to 258 atoms)
+PyMOL>align res3, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 85.000
+ ExecutiveAlign: 258 atoms aligned.
+ Executive: RMSD =    0.116 (258 to 258 atoms)
+PyMOL>align res4, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 85.000
+ ExecutiveAlign: 258 atoms aligned.
+ Executive: RMSD =    0.116 (258 to 258 atoms)
+PyMOL>align result8, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 68.000
+ ExecutiveAlign: 260 atoms aligned.
+ Executive: RMSD =    0.273 (260 to 260 atoms)
+PyMOL>align trojan, WT, cycles=0
+ Match: read scoring matrix.
+ Match: assigning 21 x 21 pairwise scores.
+ MatchAlign: aligning residues (21 vs 21)...
+ MatchAlign: score 86.000
+ ExecutiveAlign: 258 atoms aligned.
+ Executive: RMSD =    0.110 (258 to 258 atoms)
