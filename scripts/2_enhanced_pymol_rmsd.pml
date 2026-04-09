@@ -37,54 +37,83 @@ else:
     raise RuntimeError(f'Baseline PDB not found in {baseline_dir}')
 
 # Find all final mutant PDB files under alpha_mutations and beta_mutations
-result_files = []
+result_files = {'alpha_mutations': [], 'beta_mutations': []}
 for folder in ['alpha_mutations', 'beta_mutations']:
     search_dir = os.path.join(output_root, folder)
-    result_files.extend(glob.glob(os.path.join(search_dir, '**', 'dam_scored.pdb'), recursive=True))
+    files = [f for f in sorted(glob.glob(os.path.join(search_dir, '**', '*.pdb'), recursive=True)) if os.path.isfile(f)]
+    result_files[folder] = files
 
-result_files = [f for f in sorted(result_files) if os.path.isfile(f)]
+import csv
+
+csv_path = os.path.join(project_root, 'scripts', 'energy_analysis.csv')
+with open(csv_path) as f:
+    csv_rows = list(csv.DictReader(f))
 
 print('=== RMSD CALCULATIONS ===')
-print('Design | RMSD (Angstroms) | Filename')
-print('-' * 50)
+print('Design | RMSD (Angstroms) | Filename | Group')
+print('-' * 60)
 
-rmsd_results = []
+rmsd_results = {'alpha_mutations': [], 'beta_mutations': []}
 
-for i, pdb_file in enumerate(result_files):
-    design_name = f"design_{i+1}"
-    filename = os.path.basename(pdb_file)
+global_index = 1
+for folder, files in result_files.items():
+    for pdb_file in files:
+        design_name = f"design_{global_index}"
+        filename = os.path.basename(pdb_file)
+        # Build design_id as used in the CSV (e.g. alpha_mutations/results_1)
+        result_dir = os.path.basename(os.path.dirname(pdb_file))
+        design_id = f"{folder}/{result_dir}"
 
-    cmd.load(pdb_file, design_name)
-    cmd.align(f"{design_name} and name CA", "baseline and name CA")
-    rmsd_value = cmd.rms_cur('baseline', design_name)
+        cmd.load(pdb_file, design_name)
+        cmd.align(f"{design_name} and name CA", "baseline and name CA")
+        rmsd_value = cmd.rms_cur('baseline', design_name)
 
-    rmsd_results.append({
-        'design': design_name,
-        'filename': filename,
-        'rmsd': rmsd_value
-    })
+        rmsd_results[folder].append({
+            'design': design_name,
+            'design_id': design_id,
+            'filename': filename,
+            'rmsd': rmsd_value
+        })
 
-    print(f"{design_name:<7} | {rmsd_value:<15.3f} | {filename}")
+        # Update CSV row
+        for row in csv_rows:
+            if row['design_id'] == design_id:
+                row['rmsd'] = f"{rmsd_value:.3f}"
+                break
+
+        print(f"{design_name:<7} | {rmsd_value:<15.3f} | {filename:<20} | {folder}")
+        global_index += 1
+
+# Write updated CSV back
+fieldnames = csv_rows[0].keys()
+with open(csv_path, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(csv_rows)
+print(f"RMSD values written back to {csv_path}")
+
+# Save separate PNG per group
+for folder, results in rmsd_results.items():
+    if not results:
+        continue
+    cmd.hide('everything', 'all')
+    cmd.show('cartoon', 'baseline')
+    cmd.color('green', 'baseline')
+    for r in results:
+        cmd.show('cartoon', r['design'])
+    if folder == 'alpha_mutations':
+        cmd.color('blue', ' or '.join(r['design'] for r in results))
+    else:
+        cmd.color('red', ' or '.join(r['design'] for r in results))
+    cmd.orient()
+    cmd.set('ray_shadows', 'off')
+    cmd.bg_color('white')
+    cmd.ray(1200, 900)
+    out_png = os.path.join(project_root, 'output', 'mutated_prot_iteration_2', 'analysis', f'rmsd_overlay_{folder}.png')
+    cmd.png(out_png, dpi=300)
+    print(f"Saved {out_png}")
 
 python end
 
-# Create visualization showing best designs
-color green, baseline
-color blue, design_1
-color red, design_2
-color yellow, design_3
-
-# Show cartoon representation
-show cartoon, all
-hide lines, all
-
-# Create publication-quality image
-orient
-set ray_shadows, off
-bg white
-ray 1200, 900
-png rmsd_overlay_comparison.png, dpi=300
-
 print "\n=== RMSD ANALYSIS COMPLETE ==="
-print "Results saved in rmsd_overlay_comparison.png"
-print "Copy the RMSD values above into your energy_analysis.csv file"
+print "Separate overlay images saved for alpha_mutations and beta_mutations"

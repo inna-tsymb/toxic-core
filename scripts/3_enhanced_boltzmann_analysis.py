@@ -76,35 +76,58 @@ def create_enhanced_funnel_plot(df, output_file=None):
     plt.figure(figsize=(12, 9))
     
     # Extract data
-    rmsd_values = df['rmsd'].fillna(0)
+    rmsd_values = df['rmsd'].astype(float)
     energies = df['total_energy']
     design_labels = df['design_id']
     
     # Create color map for different designs
-    n_designs = len(df)
-    colors = plt.cm.viridis(np.linspace(0, 1, n_designs))
+    n_designs = len(df) - 1
+    design_colors = plt.cm.viridis(np.linspace(0, 1, max(n_designs, 1)))
     
     # Plot baseline separately
     baseline_idx = df[df['design_id'] == 'Baseline'].index[0]
-    plt.scatter(rmsd_values[baseline_idx], energies[baseline_idx], 
+    plt.scatter(0.0, energies[baseline_idx], 
                c='red', s=150, marker='s', label='Baseline', 
                zorder=5, edgecolors='black', linewidth=2)
     
-    # Plot all designs
-    for i, (idx, row) in enumerate(df.iterrows()):
-        if row['design_id'] != 'Baseline':
-            plt.scatter(row['rmsd'], row['total_energy'], 
-                       c=[colors[i]], s=120, marker='o', 
-                       zorder=4, edgecolors='black', linewidth=1,
-                       alpha=0.8)
+    # Plot all designs with known RMSD values
+    missing_rmsd = 0
+    color_index = 0
+    for idx, row in df.iterrows():
+        if row['design_id'] == 'Baseline':
+            continue
+
+        rmsd = row['rmsd']
+        if pd.isna(rmsd):
+            missing_rmsd += 1
+            continue
+
+        plt.scatter(rmsd, row['total_energy'], 
+                   c=[design_colors[color_index]], s=120, marker='o', 
+                   zorder=4, edgecolors='black', linewidth=1,
+                   alpha=0.8)
+        color_index += 1
             
-            # Add labels for significant designs
-            if row['energy_improvement'] > 0.05:  # Significant improvement
-                plt.annotate(f"{row['design_id']}\n({row['total_energy']:.3f})", 
-                           (row['rmsd'], row['total_energy']), 
-                           xytext=(10, 10), textcoords='offset points', 
-                           fontsize=9, ha='left')
-    
+        # Add labels for significant designs
+        if row['energy_improvement'] > 0.05:  # Significant improvement
+            plt.annotate(f"{row['design_id']}\n({row['total_energy']:.3f})", 
+                       (rmsd, row['total_energy']), 
+                       xytext=(10, 10), textcoords='offset points', 
+                       fontsize=9, ha='left')
+
+    if missing_rmsd > 0:
+        plt.text(0.02, 0.06, f'⚠️ {missing_rmsd} designs have missing RMSD values.',
+                 transform=plt.gca().transAxes, fontsize=11,
+                 bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.4))
+
+    # Define x-axis range
+    valid_rmsds = rmsd_values.dropna()
+    if len(valid_rmsds) > 0:
+        max_rmsd = np.nanmax(valid_rmsds) * 1.1
+    else:
+        max_rmsd = 1.0
+    plt.xlim(-0.5, max_rmsd)
+
     # Add baseline energy line
     baseline_energy = energies[baseline_idx]
     plt.axhline(y=baseline_energy, color='red', linestyle='--', 
@@ -254,8 +277,7 @@ def main():
     # Check for RMSD data
     if df['rmsd'].isna().any():
         print("⚠️  Warning: Some RMSD values are missing. Please complete PyMOL analysis.")
-        # Fill missing values temporarily
-        df['rmsd'] = df['rmsd'].fillna(0.5)
+        print("Those designs will be omitted from the funnel plot until RMSD is added.")
     
     # Calculate Boltzmann probabilities
     energies = df['total_energy'].values

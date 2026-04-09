@@ -9,7 +9,8 @@
       "Bash(ls /Users/anna_gurina/Desktop/KSE_Bioinformatics/Struct_Bio/pair_proj/toxic-core/ramachandran_*.png)",
       "Bash(python3 scripts/generate_ramachandran_plots.py)",
       "Bash(/opt/homebrew/bin/pip3.12 install:*)",
-      "Bash(/opt/homebrew/bin/python3.12 scripts/generate_ramachandran_plots.py)"
+      "Bash(/opt/homebrew/bin/python3.12 scripts/generate_ramachandran_plots.py)",
+      "Bash(python3 scripts/3_enhanced_boltzmann_analysis.py)"
     ],
     "additionalDirectories": [
       "/Users/anna_gurina/Desktop/KSE_Bioinformatics/Struct_Bio/pair_proj"

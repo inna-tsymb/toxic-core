@@ -1,22 +1,22 @@
 design_id,filename,position_info,total_energy,pp_energy,k_energy,lj_energy,solv_energy,elec_energy,energy_improvement,rmsd
 Baseline,prion_core_autopsf.pdb,Wild Type,-1.1096,,,,,,0.0,0.0
-alpha_mutations/results_1,dam_input_rpk_-1.41.pdb,GLY 14 SER,-1.4064,1.4426,0.3198,-2.7583,0.0495,-0.46,0.2968000000000002,
-alpha_mutations/results_10,dam_scored.pdb,ALA 11 LEU ALA 15 ILE,0.5147,1.977,0.5828,-1.8553,0.468,-0.6577,-1.6242999999999999,
-alpha_mutations/results_2,dam_input_rpk_-1.58.pdb,MET 7 LEU GLY 14 SER,-1.5755,1.4344,0.2971,-2.9595,0.1111,-0.4585,0.4659,
-alpha_mutations/results_3,dam_scored.pdb,MET 7 LEU GLY 14 SER GLY 18 SER,-1.1814,1.404,0.4882,-2.4204,0.3599,-1.013,0.07180000000000009,
-alpha_mutations/results_4,dam_scored.pdb,GLY 14 SER GLY 18 ALA GLY 19 THR,-1.2771,1.2638,0.4982,-2.4905,0.4044,-0.9529,0.16749999999999998,
-alpha_mutations/results_5,dam_scored.pdb,MET 7 LEU GLY 14 SER GLY 18 ALA GLY 19 THR,-1.2906,1.2564,0.4915,-2.4211,0.3383,-0.9558,0.18100000000000005,
-alpha_mutations/results_6,dam_scored.pdb,GLY 9 SER GLY 14 SER GLY 19 THR,-1.2869,1.2736,0.503,-2.4809,0.3508,-0.9334,0.1773,
-alpha_mutations/results_7,dam_scored.pdb,GLY 18 SER GLY 19 ALA,-1.0797,1.2709,0.5109,-2.1673,0.3359,-1.0301,-0.029899999999999816,
-alpha_mutations/results_8,dam_scored.pdb,GLY 18 SER GLY 19 THR,-1.0287,1.4153,0.5091,-2.3288,0.3307,-0.955,-0.08089999999999997,
-alpha_mutations/results_9,dam_scored.pdb,MET 7 ILE GLY 14 SER GLY 18 SER,-1.0065,1.4212,0.4896,-2.2752,0.3604,-1.0024,-0.10309999999999997,
-beta_mutations/results_1,dam_scored.pdb,GLY 14 SER,-0.9942,1.6209,0.5053,-2.4305,0.3816,-1.0715,-0.11539999999999995,
-beta_mutations/results_10,dam_scored.pdb,ALA 11 LEU ALA 15 ILE,-0.5873,1.4772,0.5193,-1.4479,0.5243,-1.6603,-0.5222999999999999,
-beta_mutations/results_2,dam_scored.pdb,MET 7 LEU GLY 14 SER,-0.7026,1.6066,0.5001,-2.1129,0.3366,-1.033,-0.4069999999999999,
-beta_mutations/results_3,dam_input_rpk_-1.12.pdb,MET 7 LEU GLY 14 SER GLY 18 SER,-1.1219,1.4654,0.3026,-2.6872,0.2944,-0.4971,0.012299999999999978,
-beta_mutations/results_4,dam_scored.pdb,GLY 14 SER GLY 18 ALA GLY 19 THR,-1.3259,1.5082,0.5103,-2.9377,0.6319,-1.0387,0.21630000000000016,
-beta_mutations/results_5,dam_scored.pdb,MET 4 LEU GLY 14 SER GLY 18 ALA GLY 19 THR,-0.7268,1.5135,0.5186,-2.3335,0.56,-0.9853,-0.3827999999999999,
-beta_mutations/results_6,dam_scored.pdb,GLY 9 SER GLY 14 SER GLY 19 THR,-0.4299,1.4619,0.4919,-1.0229,0.5839,-1.9446,-0.6797,
+alpha_mutations/results_1,dam_input_rpk_-1.41.pdb,GLY 14 SER,-1.4064,1.4426,0.3198,-2.7583,0.0495,-0.46,0.2968000000000002,2.837
+alpha_mutations/results_10,dam_scored.pdb,ALA 11 LEU ALA 15 ILE,0.5147,1.977,0.5828,-1.8553,0.468,-0.6577,-1.6242999999999999,8.278
+alpha_mutations/results_2,dam_input_rpk_-1.58.pdb,MET 7 LEU GLY 14 SER,-1.5755,1.4344,0.2971,-2.9595,0.1111,-0.4585,0.4659,7.75
+alpha_mutations/results_3,dam_scored.pdb,MET 7 LEU GLY 14 SER GLY 18 SER,-1.1814,1.404,0.4882,-2.4204,0.3599,-1.013,0.07180000000000009,7.896
+alpha_mutations/results_4,dam_scored.pdb,GLY 14 SER GLY 18 ALA GLY 19 THR,-1.2771,1.2638,0.4982,-2.4905,0.4044,-0.9529,0.16749999999999998,7.922
+alpha_mutations/results_5,dam_scored.pdb,MET 7 LEU GLY 14 SER GLY 18 ALA GLY 19 THR,-1.2906,1.2564,0.4915,-2.4211,0.3383,-0.9558,0.18100000000000005,7.564
+alpha_mutations/results_6,dam_scored.pdb,GLY 9 SER GLY 14 SER GLY 19 THR,-1.2869,1.2736,0.503,-2.4809,0.3508,-0.9334,0.1773,7.604
+alpha_mutations/results_7,dam_scored.pdb,GLY 18 SER GLY 19 ALA,-1.0797,1.2709,0.5109,-2.1673,0.3359,-1.0301,-0.029899999999999816,8.294
+alpha_mutations/results_8,dam_scored.pdb,GLY 18 SER GLY 19 THR,-1.0287,1.4153,0.5091,-2.3288,0.3307,-0.955,-0.08089999999999997,8.306
+alpha_mutations/results_9,dam_scored.pdb,MET 7 ILE GLY 14 SER GLY 18 SER,-1.0065,1.4212,0.4896,-2.2752,0.3604,-1.0024,-0.10309999999999997,12.011
+beta_mutations/results_1,dam_scored.pdb,GLY 14 SER,-0.9942,1.6209,0.5053,-2.4305,0.3816,-1.0715,-0.11539999999999995,8.258
+beta_mutations/results_10,dam_scored.pdb,ALA 11 LEU ALA 15 ILE,-0.5873,1.4772,0.5193,-1.4479,0.5243,-1.6603,-0.5222999999999999,8.476
+beta_mutations/results_2,dam_scored.pdb,MET 7 LEU GLY 14 SER,-0.7026,1.6066,0.5001,-2.1129,0.3366,-1.033,-0.4069999999999999,8.775
+beta_mutations/results_3,dam_input_rpk_-1.12.pdb,MET 7 LEU GLY 14 SER GLY 18 SER,-1.1219,1.4654,0.3026,-2.6872,0.2944,-0.4971,0.012299999999999978,17.605
+beta_mutations/results_4,dam_scored.pdb,GLY 14 SER GLY 18 ALA GLY 19 THR,-1.3259,1.5082,0.5103,-2.9377,0.6319,-1.0387,0.21630000000000016,14.666
+beta_mutations/results_5,dam_scored.pdb,MET 4 LEU GLY 14 SER GLY 18 ALA GLY 19 THR,-0.7268,1.5135,0.5186,-2.3335,0.56,-0.9853,-0.3827999999999999,14.962
+beta_mutations/results_6,dam_scored.pdb,GLY 9 SER GLY 14 SER GLY 19 THR,-0.4299,1.4619,0.4919,-1.0229,0.5839,-1.9446,-0.6797,11.527
 beta_mutations/results_7,dam_scored.pdb,GLY 18 SER GLY 19 ALA,-0.7984,1.3492,0.4931,-1.2389,0.5455,-1.9474,-0.3111999999999999,
 beta_mutations/results_8,dam_scored.pdb,GLY 18 SER GLY 19 THR,-0.9771,1.3224,0.5026,-1.3846,0.4853,-1.9028,-0.13249999999999995,
 beta_mutations/results_9,dam_scored.pdb,MET 7 ILE GLY 14 SER GLY 18 SER,-0.9136,1.5002,0.4811,-1.7629,0.491,-1.623,-0.19599999999999995,
