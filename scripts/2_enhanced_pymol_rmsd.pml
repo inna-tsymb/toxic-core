@@ -17,7 +17,7 @@ except NameError:
     project_root = None
 
 if project_root is None:
-    candidate_root = os.path.expanduser('~/Desktop/KSE_Bioinformatics/Struct_Bio/pair_proj/toxic-core')
+    candidate_root = os.path.expanduser('~/AnnaProjects/toxic-core')
     if os.path.isdir(os.path.join(candidate_root, 'output')):
         project_root = candidate_root
 
@@ -43,9 +43,18 @@ for folder in ['alpha_mutations', 'beta_mutations']:
     files = [f for f in sorted(glob.glob(os.path.join(search_dir, '**', '*.pdb'), recursive=True)) if os.path.isfile(f)]
     result_files[folder] = files
 
+# Also include WT baseline directories (design_id = bare directory name)
+wt_dirs = ['prion_core_autopsf_openMM.pdb', 'prion_beta_autopsf_openMM.pdb']
+wt_files = []
+for wt_dir in wt_dirs:
+    wt_path = os.path.join(output_root, wt_dir)
+    files = [f for f in glob.glob(os.path.join(wt_path, '*.pdb')) if os.path.isfile(f)]
+    if files:
+        wt_files.append((wt_dir, files[0]))
+
 import csv
 
-csv_path = os.path.join(project_root, 'scripts', 'energy_analysis.csv')
+csv_path = os.path.join(project_root, 'energy_analysis.csv')
 with open(csv_path) as f:
     csv_rows = list(csv.DictReader(f))
 
@@ -54,6 +63,13 @@ print('Design | RMSD (Angstroms) | Filename | Group')
 print('-' * 60)
 
 rmsd_results = {'alpha_mutations': [], 'beta_mutations': []}
+
+def write_csv():
+    fieldnames = csv_rows[0].keys()
+    with open(csv_path, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(csv_rows)
 
 global_index = 1
 for folder, files in result_files.items():
@@ -64,33 +80,69 @@ for folder, files in result_files.items():
         result_dir = os.path.basename(os.path.dirname(pdb_file))
         design_id = f"{folder}/{result_dir}"
 
+        # Find matching CSV row
+        matched_row = None
+        for row in csv_rows:
+            if row['design_id'] == design_id:
+                matched_row = row
+                break
+
+        # Skip if RMSD already computed
+        if matched_row and matched_row.get('rmsd', '').strip():
+            print(f"SKIP    | already computed ({matched_row['rmsd']:>6} Å) | {filename:<20} | {folder}/{result_dir}")
+            global_index += 1
+            continue
+
+        try:
+            cmd.load(pdb_file, design_name)
+            cmd.align(f"{design_name} and name CA", "baseline and name CA")
+            rmsd_value = cmd.rms_cur('baseline', design_name)
+
+            rmsd_results[folder].append({
+                'design': design_name,
+                'design_id': design_id,
+                'filename': filename,
+                'rmsd': rmsd_value
+            })
+
+            # Update CSV row and write immediately so partial results are saved
+            if matched_row:
+                matched_row['rmsd'] = f"{rmsd_value:.3f}"
+            write_csv()
+
+            print(f"{design_name:<7} | {rmsd_value:<15.3f} | {filename:<20} | {folder}")
+        except Exception as e:
+            print(f"ERROR   | {design_id}: {e}")
+
+        global_index += 1
+
+# Process WT directories separately
+for design_id, pdb_file in wt_files:
+    matched_row = None
+    for row in csv_rows:
+        if row['design_id'] == design_id:
+            matched_row = row
+            break
+
+    if matched_row and matched_row.get('rmsd', '').strip():
+        print(f"SKIP    | already computed ({matched_row['rmsd']:>6} Å) | {os.path.basename(pdb_file):<20} | {design_id}")
+        continue
+
+    design_name = f"wt_{design_id.replace('.pdb','').replace('_','')}"
+    try:
         cmd.load(pdb_file, design_name)
         cmd.align(f"{design_name} and name CA", "baseline and name CA")
         rmsd_value = cmd.rms_cur('baseline', design_name)
 
-        rmsd_results[folder].append({
-            'design': design_name,
-            'design_id': design_id,
-            'filename': filename,
-            'rmsd': rmsd_value
-        })
+        if matched_row:
+            matched_row['rmsd'] = f"{rmsd_value:.3f}"
+        write_csv()
 
-        # Update CSV row
-        for row in csv_rows:
-            if row['design_id'] == design_id:
-                row['rmsd'] = f"{rmsd_value:.3f}"
-                break
+        print(f"{design_name:<7} | {rmsd_value:<15.3f} | {os.path.basename(pdb_file):<20} | {design_id}")
+    except Exception as e:
+        print(f"ERROR   | {design_id}: {e}")
 
-        print(f"{design_name:<7} | {rmsd_value:<15.3f} | {filename:<20} | {folder}")
-        global_index += 1
-
-# Write updated CSV back
-fieldnames = csv_rows[0].keys()
-with open(csv_path, 'w', newline='') as f:
-    writer = csv.DictWriter(f, fieldnames=fieldnames)
-    writer.writeheader()
-    writer.writerows(csv_rows)
-print(f"RMSD values written back to {csv_path}")
+print(f"RMSD values written to {csv_path}")
 
 # Save separate PNG per group
 for folder, results in rmsd_results.items():
