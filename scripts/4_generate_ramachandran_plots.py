@@ -130,59 +130,56 @@ def create_ramachandran_plot(phi_psi_data, title, filename, highlight_outliers=T
     
     return fig, ax
 
-def create_comparison_plot(all_data, output_file='ramachandran_comparison.png'):
+def create_comparison_plot(all_data, output_file='ramachandran_comparison.png', suptitle=None):
     """
-    Create a comparison plot showing baseline vs all designs
+    Create a grid comparison plot showing baseline vs all designs.
+    Auto-sizes the grid to fit however many entries are in all_data.
     """
-    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
-    axes = axes.flatten()
-    
-    design_names = list(all_data.keys())
-    
+    n = len(all_data)
+    ncols = 4
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(ncols * 5, nrows * 4))
+    axes = np.array(axes).flatten()
+
     for i, (name, data) in enumerate(all_data.items()):
-        if i >= 6:  # Limit to 6 plots for layout
-            break
-            
         ax = axes[i]
-        
+
         phi_values = [d['phi'] for d in data]
         psi_values = [d['psi'] for d in data]
-        
-        # Color baseline differently
-        if 'baseline' in name.lower():
-            color = 'red'
-            alpha = 0.8
+
+        if 'baseline' in name.lower() or 'wt' in name.lower():
+            color = 'crimson'
+            alpha = 0.85
         else:
-            color = 'blue' 
+            color = 'steelblue'
             alpha = 0.6
-            
-        ax.scatter(phi_values, psi_values, c=color, s=60, alpha=alpha)
-        
-        # Add allowed regions
-        alpha_phi = np.linspace(-80, -40, 100)
-        alpha_psi = -45 + 10 * np.sin((alpha_phi + 60) * np.pi / 40)
-        ax.plot(alpha_phi, alpha_psi, 'g--', alpha=0.5, label='α-helix ideal')
-        
+
+        ax.scatter(phi_values, psi_values, c=color, s=50, alpha=alpha, edgecolors='none')
+
         ax.set_xlim(-180, 180)
         ax.set_ylim(-180, 180)
-        ax.set_title(name, fontsize=12, weight='bold')
+        ax.set_title(name, fontsize=9, weight='bold', wrap=True)
         ax.grid(True, alpha=0.3)
-        
-        if i >= 3:  # Bottom row
-            ax.set_xlabel('φ (degrees)')
-        if i % 3 == 0:  # Left column
-            ax.set_ylabel('ψ (degrees)')
-    
+        ax.axhline(0, color='gray', lw=0.5)
+        ax.axvline(0, color='gray', lw=0.5)
+
+        row, col = divmod(i, ncols)
+        if row == nrows - 1:
+            ax.set_xlabel('φ (°)', fontsize=8)
+        if col == 0:
+            ax.set_ylabel('ψ (°)', fontsize=8)
+
     # Hide unused subplots
-    for j in range(i+1, 6):
+    for j in range(n, len(axes)):
         axes[j].set_visible(False)
-    
-    plt.suptitle('Ramachandran Plot Comparison: Baseline vs Designed Variants', 
-                fontsize=16, weight='bold')
+
+    title = suptitle or 'Ramachandran Plot Comparison: Baseline vs Designed Variants'
+    plt.suptitle(title, fontsize=14, weight='bold')
     plt.tight_layout()
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    plt.close(fig)
     print(f"Comparison plot saved: {output_file}")
-    
+
     return fig
 
 def analyze_outliers(phi_psi_data):
@@ -219,80 +216,93 @@ def analyze_outliers(phi_psi_data):
 
 def main():
     """
-    Main function to generate all Ramachandran plots
+    Main function to generate all Ramachandran plots for mutated_prot_iteration_2.
+    Outputs to output/mutated_prot_iteration_2/analysis/ramachandran_plots/
     """
-    print("Generating Ramachandran Plots for Prion Core Designs")
-    print("="*55)
-    
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    designs_root = os.path.join(project_root, 'designs_analysed')
+    import csv as csv_mod
 
-    design_groups = {
-        'negative-design': {
-            'dirs': [
-                os.path.join(designs_root, 'negative-design', 'alpha'),
-                os.path.join(designs_root, 'negative-design', 'beta'),
-            ],
-            'baseline': os.path.join(designs_root, 'prion_beta_autopsf.pdb'),
-        },
-        'positive-design': {
-            'dirs': [os.path.join(designs_root, 'positive-design')],
-            'baseline': os.path.join(designs_root, 'prion_core_autopsf.pdb'),
-        },
-    }
+    print("Generating Ramachandran Plots for Prion Core Designs (iteration 2)")
+    print("=" * 60)
+
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_root = os.path.join(project_root, 'output', 'mutated_prot_iteration_2')
+    output_dir = os.path.join(output_root, 'analysis', 'ramachandran_plots')
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Read mutation labels from energy CSV
+    csv_path = os.path.join(output_root, 'analysis', '1_energy_analysis+rmsd.csv')
+    label_map = {}  # design_id -> position_info
+    with open(csv_path) as f:
+        for row in csv_mod.DictReader(f):
+            label_map[row['design_id']] = row['position_info']
 
     parser = PDBParser(QUIET=True)
 
-    for group_name, config in design_groups.items():
-        print(f"\nProcessing {group_name}...")
-        output_dir = os.path.join(project_root, 'output', 'plots', group_name)
-        os.makedirs(output_dir, exist_ok=True)
+    # Load baseline (WT, alpha structure)
+    baseline_dir = os.path.join(output_root, 'prion_core_autopsf_openMM.pdb')
+    baseline_pdbs = glob.glob(os.path.join(baseline_dir, '*.pdb'))
+    if not baseline_pdbs:
+        raise RuntimeError(f"Baseline PDB not found in {baseline_dir}")
+    baseline_pdb = baseline_pdbs[0]
+    print(f"Loading baseline: {baseline_pdb}")
+    baseline_structure = parser.get_structure('baseline', baseline_pdb)
+    baseline_phi_psi = calculate_phi_psi(baseline_structure)
+    create_ramachandran_plot(
+        baseline_phi_psi, 'Baseline (WT)',
+        os.path.join(output_dir, 'ramachandran_baseline.png')
+    )
 
-        pdb_files = []
-        for d in config['dirs']:
-            pdb_files += sorted(glob.glob(os.path.join(d, '*.pdb')))
+    # Process each mutation group
+    for group in ['alpha_mutations', 'beta_mutations']:
+        print(f"\nProcessing {group}...")
+        search_dir = os.path.join(output_root, group)
 
-        all_data = {}
+        # Collect result dirs sorted numerically
+        result_dirs = sorted(
+            [p for p in glob.glob(os.path.join(search_dir, 'results_*'))
+             if os.path.isdir(p)],
+            key=lambda p: int(os.path.basename(p).split('_')[1])
+        )
 
-        # Add baseline first
-        baseline_path = config['baseline']
-        baseline_name = os.path.splitext(os.path.basename(baseline_path))[0]
-        print(f"  Processing baseline: {baseline_name}...")
-        baseline_structure = parser.get_structure(baseline_name, baseline_path)
-        baseline_phi_psi = calculate_phi_psi(baseline_structure)
-        if baseline_phi_psi:
-            all_data[baseline_name] = baseline_phi_psi
-            create_ramachandran_plot(baseline_phi_psi, baseline_name,
-                                     os.path.join(output_dir, f"ramachandran_{baseline_name}.png"))
+        all_data = {'Baseline (WT)': baseline_phi_psi}
 
+        for result_dir in result_dirs:
+            result_name = os.path.basename(result_dir)
+            design_id = f"{group}/{result_name}"
+            position_info = label_map.get(design_id, result_name)
+            short_title = f"{result_name}\n{position_info}"
 
-        for filepath in pdb_files:
-            name = os.path.splitext(os.path.basename(filepath))[0]
-            print(f"  Processing {name}...")
+            pdb_files = glob.glob(os.path.join(result_dir, '*.pdb'))
+            if not pdb_files:
+                print(f"  WARNING: no PDB in {result_dir}, skipping")
+                continue
+            pdb_file = pdb_files[0]
 
-            structure = parser.get_structure(name, filepath)
+            print(f"  {design_id}: {position_info}")
+            structure = parser.get_structure(result_name, pdb_file)
             phi_psi_data = calculate_phi_psi(structure)
 
-            if phi_psi_data:
-                all_data[name] = phi_psi_data
-                plot_filename = os.path.join(output_dir, f"ramachandran_{name}.png")
-                create_ramachandran_plot(phi_psi_data, name, plot_filename)
-                outliers = analyze_outliers(phi_psi_data)
-                print(f"    Found {len(outliers)} potential outliers")
-            else:
-                print(f"    Warning: No dihedral angles calculated for {name}")
+            if not phi_psi_data:
+                print(f"    WARNING: no dihedral angles calculated")
+                continue
 
+            all_data[short_title] = phi_psi_data
+            plot_file = os.path.join(output_dir, f'ramachandran_{group}_{result_name}.png')
+            create_ramachandran_plot(phi_psi_data, short_title, plot_file)
 
-        if len(all_data) > 1:
-            create_comparison_plot(all_data, output_file=os.path.join(output_dir, 'ramachandran_comparison.png'))
+            outliers = analyze_outliers(phi_psi_data)
+            print(f"    {len(outliers)} outlier(s)")
 
-    print("\n" + "="*55)
-    print("Ramachandran analysis complete!")
-    print(f"Generated files in output/plots/negative-design/ and output/plots/positive-design/")
-    print("\nFor your report:")
-    print("• Include comparison plot showing maintained backbone geometry")
-    print("• Note that designs preserve α-helical character")
-    print("• Highlight that mutations don't create outliers")
+        # Grid comparison for this group
+        group_label = group.replace('_', ' ').title()
+        create_comparison_plot(
+            all_data,
+            output_file=os.path.join(output_dir, f'ramachandran_comparison_{group}.png'),
+            suptitle=f'Ramachandran Comparison — {group_label} vs Baseline'
+        )
+
+    print("\n" + "=" * 60)
+    print(f"Done. Plots written to:\n  {output_dir}")
 
 if __name__ == "__main__":
     main()
