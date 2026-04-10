@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Updated Boltzmann Analysis for Complete Ensemble (Alpha & Beta)
-Visually separates stable Alpha designs from collapsed Beta designs.
+Updated Boltzmann Analysis for Complete Ensemble
+Correctly distinguishes between WT Alpha and WT Beta baselines!
 """
 
 import sys
@@ -9,6 +9,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.patches as mpatches
 
 def load_energy_data(csv_file=None):
     if csv_file is None:
@@ -43,7 +44,6 @@ def create_enhanced_funnel_plot(df, output_file=None):
         
     plt.figure(figsize=(12, 9))
     
-    # Створюємо списки для легенди, щоб не дублювати
     added_alpha = False
     added_beta = False
     
@@ -55,14 +55,21 @@ def create_enhanced_funnel_plot(df, output_file=None):
         if pd.isna(rmsd):
             continue
 
-        # Логіка розфарбовування (Альфа - сині, Бета - червоні, Бейслайн - зелена зірка)
-        if 'Baseline' in design_id or 'wt_' in design_id.lower() or design_id == 'prion_core_autopsf_openMM.pdb':
-            plt.scatter(rmsd, energy, c='green', s=300, marker='*', zorder=5, 
-                        edgecolors='black', linewidth=1.5, label='WT Baseline')
-            plt.annotate('Baseline', (rmsd, energy), xytext=(10, 10), textcoords='offset points', weight='bold')
+        # 1. WT Alpha Baseline
+        if 'prion_core' in design_id:
+            plt.scatter(rmsd, energy, c='forestgreen', s=350, marker='*', zorder=5, 
+                        edgecolors='black', linewidth=1.5, label='WT Alpha')
+            plt.annotate('WT Alpha', (rmsd, energy), xytext=(-20, 15), textcoords='offset points', weight='bold', color='forestgreen')
             
+        # 2. WT Beta Baseline
+        elif 'prion_beta' in design_id:
+            plt.scatter(rmsd, energy, c='darkorange', s=350, marker='*', zorder=5, 
+                        edgecolors='black', linewidth=1.5, label='WT Beta')
+            plt.annotate('WT Beta', (rmsd, energy), xytext=(10, 10), textcoords='offset points', weight='bold', color='darkorange')
+            
+        # 3. Alpha Designs
         elif 'alpha' in design_id.lower():
-            label = 'Alpha Designs (Stable)' if not added_alpha else ""
+            label = 'Alpha Designs' if not added_alpha else ""
             plt.scatter(rmsd, energy, c='dodgerblue', s=120, marker='o', zorder=4, 
                         edgecolors='black', linewidth=1, alpha=0.8, label=label)
             added_alpha = True
@@ -70,23 +77,20 @@ def create_enhanced_funnel_plot(df, output_file=None):
                 plt.annotate(design_id.split('/')[-1].replace('results_', 'A'), 
                              (rmsd, energy), xytext=(8, -12), textcoords='offset points', fontsize=8)
                 
+        # 4. Beta Designs
         elif 'beta' in design_id.lower():
             label = 'Beta Designs (Collapsed)' if not added_beta else ""
             plt.scatter(rmsd, energy, c='crimson', s=120, marker='X', zorder=3, 
                         edgecolors='black', linewidth=1, alpha=0.7, label=label)
             added_beta = True
             plt.annotate(design_id.split('/')[-1].replace('results_', 'B'), 
-                         (rmsd, energy), xytext=(8, 8), textcoords='offset points', fontsize=8, color='darkred')
+                         (rmsd, energy), xytext=(8, 8), textcoords='offset points', fontsize=8)
 
-    plt.xlabel('RMSD to WT Structure (Å) - Shows Structural Deviation', fontsize=14)
+    plt.xlabel('RMSD to Respective WT Structure (Å)', fontsize=14)
     plt.ylabel('Total Energy (kcal/mol)', fontsize=14)
-    plt.title('Prion Core Folding Landscape\nAlpha Stabilization vs. Beta Collapse', fontsize=16, weight='bold')
+    plt.title('Prion Core Folding Landscape\nResolution of Metastability', fontsize=16, weight='bold')
     plt.grid(True, alpha=0.3, linestyle='--')
     plt.legend(loc='upper left', fontsize=12, shadow=True)
-    
-    # Текстова врізка з поясненням
-    plt.text(0.65, 0.95, "Notice the severe structural collapse\n(High RMSD) of Beta designs,\nproving negative design success.", 
-             transform=plt.gca().transAxes, fontsize=11, bbox=dict(boxstyle='round', facecolor='whitesmoke', alpha=0.8))
 
     plt.tight_layout()
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -101,40 +105,41 @@ def create_comprehensive_probability_plot(df, probabilities, output_file=None):
     plt.figure(figsize=(14, 7))
     percentages = probabilities * 100
     
-    # Кольори для стовпців
     colors = []
     labels = []
     for design_id in df['design_id']:
         design_id_str = str(design_id)
-        if 'Baseline' in design_id_str or 'wt_' in design_id_str.lower():
-            colors.append('green')
-            labels.append('WT Baseline')
+        if 'prion_core' in design_id_str:
+            colors.append('forestgreen')
+            labels.append('WT Alpha')
+        elif 'prion_beta' in design_id_str:
+            colors.append('darkorange')
+            labels.append('WT Beta')
         elif 'alpha' in design_id_str.lower():
             colors.append('dodgerblue')
-            labels.append(design_id_str.split('/')[-1].replace('results_', 'Alpha '))
+            labels.append(design_id_str.split('/')[-1].replace('results_', 'A'))
         else:
             colors.append('crimson')
-            labels.append(design_id_str.split('/')[-1].replace('results_', 'Beta '))
+            labels.append(design_id_str.split('/')[-1].replace('results_', 'B'))
 
     bars = plt.bar(range(len(labels)), percentages, color=colors, alpha=0.8, edgecolor='black')
     
     for bar, pct in zip(bars, percentages):
         height = bar.get_height()
-        if pct > 0.1:  # Показуємо цифри тільки якщо ймовірність більше 0.1%
+        if pct > 0.1:  
             plt.text(bar.get_x() + bar.get_width()/2., height + 0.5, f'{pct:.1f}%', 
                      ha='center', va='bottom', fontsize=10, weight='bold')
 
     plt.ylabel('Population Percentage at 300K (%)', fontsize=12)
-    plt.title('Boltzmann Population Distribution of the Entire Ensemble', fontsize=16, weight='bold')
+    plt.title('Boltzmann Population Distribution', fontsize=16, weight='bold')
     plt.grid(True, alpha=0.3, axis='y')
     plt.xticks(range(len(labels)), labels, rotation=45, ha='right', fontsize=10)
     
-    # Додаємо кастомну легенду
-    import matplotlib.patches as mpatches
     alpha_patch = mpatches.Patch(color='dodgerblue', label='Alpha Designs')
     beta_patch = mpatches.Patch(color='crimson', label='Beta Designs')
-    wt_patch = mpatches.Patch(color='green', label='Wild Type')
-    plt.legend(handles=[alpha_patch, beta_patch, wt_patch], loc='upper right', fontsize=12)
+    wt_a_patch = mpatches.Patch(color='forestgreen', label='WT Alpha')
+    wt_b_patch = mpatches.Patch(color='darkorange', label='WT Beta')
+    plt.legend(handles=[alpha_patch, beta_patch, wt_a_patch, wt_b_patch], loc='upper right', fontsize=12)
 
     plt.tight_layout()
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -145,7 +150,6 @@ def main():
     df = load_energy_data()
     if df is None: return
     
-    # Drop rows with NaN energy to prevent math errors
     df = df.dropna(subset=['total_energy']).copy()
     df.reset_index(drop=True, inplace=True)
     
