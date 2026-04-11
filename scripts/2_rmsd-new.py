@@ -55,7 +55,7 @@ for wt_dir in wt_dirs:
     if files:
         wt_files.append((wt_dir, files[0]))
 
-csv_path = os.path.join(project_root, 'energy_analysis.csv')
+csv_path = os.path.join(project_root, 'output', 'mutated_prot_iteration_2', 'analysis', '1_energy_analysis+rmsd.csv')
 with open(csv_path) as f:
     csv_rows = list(csv.DictReader(f))
 

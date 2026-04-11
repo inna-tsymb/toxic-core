@@ -14,7 +14,8 @@ import matplotlib.patches as mpatches
 def load_energy_data(csv_file=None):
     if csv_file is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_file = os.path.join(script_dir, 'energy_analysis.csv')
+        project_root = os.path.abspath(os.path.join(script_dir, '..'))
+        csv_file = os.path.join(project_root, 'output', 'mutated_prot_iteration_2', 'analysis', '1_energy_analysis+rmsd.csv')
     try:
         return pd.read_csv(csv_file)
     except FileNotFoundError:
@@ -38,9 +39,9 @@ def calculate_boltzmann_probabilities(energies, temperature=300):
 def create_enhanced_funnel_plot(df, output_file=None):
     if output_file is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        plots_dir = os.path.join(script_dir, '..', 'plots')
-        os.makedirs(plots_dir, exist_ok=True)
-        output_file = os.path.join(plots_dir, 'comprehensive_funnel_plot.png')
+        analysis_dir = os.path.join(script_dir, '..', 'output', 'mutated_prot_iteration_2', 'analysis')
+        os.makedirs(analysis_dir, exist_ok=True)
+        output_file = os.path.join(analysis_dir, 'comprehensive_funnel_plot.png')
         
     plt.figure(figsize=(12, 9))
     
@@ -99,8 +100,8 @@ def create_enhanced_funnel_plot(df, output_file=None):
 def create_comprehensive_probability_plot(df, probabilities, output_file=None):
     if output_file is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        plots_dir = os.path.join(script_dir, '..', 'plots')
-        output_file = os.path.join(plots_dir, 'ensemble_probabilities.png')
+        analysis_dir = os.path.join(script_dir, '..', 'output', 'mutated_prot_iteration_2', 'analysis')
+        output_file = os.path.join(analysis_dir, 'ensemble_probabilities.png')
         
     plt.figure(figsize=(14, 7))
     percentages = probabilities * 100
